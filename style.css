@@ -1,0 +1,61 @@
+html,
+body {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+blockquote {
+  margin: 20px 0;
+  padding-left: 1.5rem;
+  border-left: 5px solid #302f4b;
+}
+
+.header {
+  display: flex;
+}
+
+.blueBox {
+  background-color: rgb(2, 3, 35);
+  color: white;
+  display: flex;
+  align-items: center;
+}
+
+.completeName {
+  font-size: 2rem;
+  font-family: Oswald;
+  font-weight: lighter;
+  text-align: left;
+  letter-spacing: 5px;
+  padding: 20px;
+}
+
+.oswaldTitle,
+h4 {
+  color: rgb(2, 3, 35);
+  font-family: Oswald;
+  font-weight: lighter;
+  letter-spacing: 5px;
+  font-size: 1.5rem;
+}
+
+.ralewayTitle {
+  color: rgb(2, 3, 35);
+  font-family: Raleway;
+  font-weight: bolder;
+  font-size: 1.25rem;
+}
+
+.ralewayText {
+  color: rgb(2, 3, 35);
+  font-family: Raleway;
+  text-align: justify;
+  font-weight: normal;
+  letter-spacing: normal;
+  font-size: 1rem;
+}
+
+.emphasis {
+  font-weight: bold;
+}
