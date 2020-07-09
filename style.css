@@ -11,6 +11,14 @@ blockquote {
   border-left: 5px solid #302f4b;
 }
 
+.container {
+  min-height: 100%;
+}
+
+.row {
+  margin-bottom: 0px;
+}
+
 .header {
   display: flex;
 }
