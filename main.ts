@@ -1,195 +1,203 @@
 import "./style.css";
+import { Canvas } from "./common/canvas";
+import { Quadrant } from "./types/main";
 
-type Line = {
+class Line {
   x: number;
   y: number;
-  size: number;
+  lineFunction: ReturnType<typeof this.defineLineFunction>;
+
   blur: number;
+  size: number;
+  displacement = 0;
+
   radians: number;
-  displacement: number;
-  isOutOfScreen(line: Line): boolean;
-};
+  quadrant: Quadrant;
 
-enum Quadrant {
-  First = 0,
-  Second,
-  Third,
-  Fourth,
-}
+  constructor() {
+    this.radians = Math.random() * Math.PI * 2;
+    this.quadrant = Math.floor(this.radians / (Math.PI / 2));
 
-let unblurredLines = 0;
-const canvas = document.querySelector("canvas");
-const lines: Line[] = Array.from({ length: 10 }, generateLine);
+    this.blur = Math.floor(Math.random() * 3) + 3;
+    this.size = Math.floor(Math.random() * 6000 + 3000);
 
-function getAngleData(radians: number) {
-  const sin = Math.sin(radians);
-  const cos = Math.cos(radians);
-  const quadrant = Math.floor(radians / (Math.PI / 2)) as Quadrant;
+    this.lineFunction = this.defineLineFunction();
 
-  return { sin, cos, quadrant };
-}
-
-function defineEntryPoint(
-  radians: number
-): Pick<Line, "x" | "y" | "isOutOfScreen"> {
-  const slope = Math.tan(radians);
-  const { sin, cos, quadrant } = getAngleData(radians);
-
-  const randomX = Math.floor(((Math.random() * 10) / 10) * window.innerWidth);
-  const randomY = Math.floor(((Math.random() * 10) / 10) * window.innerHeight);
-
-  const yIntercept = Math.floor(randomY - slope * randomX);
-  const xIntercept = Math.floor(-yIntercept / slope);
-
-  const widthY = Math.floor(slope * window.innerWidth + yIntercept);
-  const heightX = Math.floor((window.innerHeight - yIntercept) / slope);
-
-  const xByQuadrant = {
-    [Quadrant.First]: xIntercept,
-    [Quadrant.Second]: window.innerWidth,
-    [Quadrant.Third]: heightX,
-    [Quadrant.Fourth]: 0,
-  };
-
-  const yByQuadrant = {
-    [Quadrant.First]: 0,
-    [Quadrant.Second]: widthY,
-    [Quadrant.Third]: window.innerHeight,
-    [Quadrant.Fourth]: yIntercept,
-  };
-
-  const quandrantOutOfScreen = {
-    [Quadrant.First]: (line: Line) => {
-      const currentSize = line.displacement - line.size;
-      const sizeYProjection = cos * currentSize;
-      const sizeXProjection = sin * currentSize;
-
-      if (radians > Math.PI / 4) {
-        return sizeYProjection > window.innerHeight;
-      }
-
-      return sizeXProjection + xIntercept > window.innerWidth;
-    },
-    [Quadrant.Second]: (line: Line) => {
-      const currentSize = line.displacement - line.size;
-      const sizeYProjection = Math.abs(cos) * currentSize;
-      const sizeXProjection = sin * currentSize;
-
-      if (radians > (3 * Math.PI) / 4) {
-        return sizeXProjection > window.innerWidth;
-      }
-
-      return sizeYProjection + widthY > window.innerHeight;
-    },
-    [Quadrant.Third]: (line: Line) => {
-      const currentSize = line.displacement - line.size;
-      const sizeXProjection = Math.abs(cos) * currentSize;
-      const sizeYProjection = Math.abs(sin) * currentSize;
-
-      if (radians > (5 * Math.PI) / 4) {
-        return sizeYProjection > window.innerHeight;
-      }
-
-      return sizeXProjection > heightX;
-    },
-    [Quadrant.Fourth]: (line: Line) => {
-      const currentSize = line.displacement - line.size;
-      const sizeXProjection = cos * currentSize;
-      const sizeYProjection = Math.abs(sin) * currentSize;
-
-      if (radians > (7 * Math.PI) / 4) {
-        return sizeXProjection > window.innerWidth;
-      }
-
-      return sizeYProjection > yIntercept;
-    },
-  };
-
-  return {
-    x: xByQuadrant[quadrant],
-    y: yByQuadrant[quadrant],
-    isOutOfScreen: quandrantOutOfScreen[quadrant],
-  };
-}
-
-function generateLine(): Line {
-  const degree = Math.floor(Math.random() * 360);
-  const size = Math.floor(Math.random() * 3000 + 1000);
-
-  const radians = degree * (Math.PI / 180);
-
-  const entrypoint = defineEntryPoint(radians);
-
-  let blur = 0;
-
-  if (unblurredLines === 5) {
-    blur = Math.floor(Math.random() * 5) + 3;
-  } else {
-    unblurredLines += 1;
+    this.x = this.defineX();
+    this.y = this.defineY();
   }
 
-  return {
-    size,
-    blur,
-    radians,
-    displacement: 0,
-    ...entrypoint,
-  };
-}
+  isOutOfScreen() {
+    const cos = Math.cos(this.radians);
+    const sin = Math.sin(this.radians);
 
-function drawLine(line: Line, index: number) {
-  const ctx = canvas?.getContext("2d");
+    const currentSize = this.displacement - this.size;
 
-  if (!ctx) {
-    return;
+    const { xIntercept, widthY, yIntercept, heightX } = this.lineFunction;
+
+    const quandrantOutOfScreen = {
+      [Quadrant.First]: () => {
+        const sizeYProjection = cos * currentSize;
+        const sizeXProjection = sin * currentSize;
+
+        if (this.radians > Math.PI / 4) {
+          return sizeYProjection > innerHeight;
+        }
+
+        return sizeXProjection + xIntercept > innerWidth;
+      },
+      [Quadrant.Second]: () => {
+        const sizeYProjection = Math.abs(cos) * currentSize;
+        const sizeXProjection = sin * currentSize;
+
+        if (this.radians > (3 * Math.PI) / 4) {
+          return sizeXProjection > innerWidth;
+        }
+
+        return sizeYProjection + widthY > innerHeight;
+      },
+      [Quadrant.Third]: () => {
+        const sizeXProjection = Math.abs(cos) * currentSize;
+        const sizeYProjection = Math.abs(sin) * currentSize;
+
+        if (this.radians > (5 * Math.PI) / 4) {
+          return sizeYProjection > innerHeight;
+        }
+
+        return sizeXProjection > heightX;
+      },
+      [Quadrant.Fourth]: () => {
+        const sizeXProjection = cos * currentSize;
+        const sizeYProjection = Math.abs(sin) * currentSize;
+
+        if (this.radians > (7 * Math.PI) / 4) {
+          return sizeXProjection > innerWidth;
+        }
+
+        return sizeYProjection > yIntercept;
+      },
+    };
+
+    return quandrantOutOfScreen[this.quadrant]();
   }
 
-  const { x, y, radians, size, displacement, isOutOfScreen, blur } = line;
+  draw(ctx: CanvasRenderingContext2D) {
+    const deltaX = this.displacement - this.size;
+    const opacity = this.blur ? 1 - this.blur / 10 : 1;
 
-  ctx.translate(x, y);
-  ctx.rotate(radians);
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.radians);
 
-  const deltaX = displacement - size;
-  const gradient = ctx.createLinearGradient(deltaX, 0, displacement, 0);
+    const gradient = ctx.createLinearGradient(deltaX, 0, this.displacement, 0);
 
-  gradient.addColorStop(0, "transparent");
-  gradient.addColorStop(0.5, "black");
-  gradient.addColorStop(1, "transparent");
+    gradient.addColorStop(0, "transparent");
+    gradient.addColorStop(0.5, "black");
+    gradient.addColorStop(1, "transparent");
 
-  ctx.lineCap = "round";
-  ctx.strokeStyle = gradient;
-  ctx.filter = `blur(${blur}px)`;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = gradient;
+    ctx.filter = `blur(${this.blur}px) opacity(${opacity})`;
 
-  ctx.beginPath();
-  ctx.moveTo(deltaX, 0);
-  ctx.lineTo(displacement, 0);
-  ctx.stroke();
-  ctx.closePath();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.beginPath();
+    ctx.moveTo(deltaX, 0);
+    ctx.lineTo(this.displacement, 0);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-  line.displacement += 15;
+    this.displacement += 15;
+  }
 
-  if (isOutOfScreen(line)) {
-    if (blur === 0) {
-      unblurredLines -= 1;
+  private defineLineFunction() {
+    const slope = Math.tan(this.radians);
+
+    const randomX = Math.floor(((Math.random() * 10) / 10) * innerWidth);
+    const randomY = Math.floor(((Math.random() * 10) / 10) * innerHeight);
+
+    const yIntercept = Math.floor(randomY - slope * randomX);
+    const xIntercept = Math.floor(-yIntercept / slope);
+
+    const widthY = Math.floor(slope * innerWidth + yIntercept);
+    const heightX = Math.floor((innerHeight - yIntercept) / slope);
+
+    return {
+      widthY,
+      heightX,
+      xIntercept,
+      yIntercept,
+    };
+  }
+
+  private defineX() {
+    const { xIntercept, heightX } = this.lineFunction;
+
+    const xByQuadrant = {
+      [Quadrant.First]: xIntercept,
+      [Quadrant.Second]: innerWidth,
+      [Quadrant.Third]: heightX,
+      [Quadrant.Fourth]: 0,
+    };
+
+    return xByQuadrant[this.quadrant];
+  }
+
+  private defineY() {
+    const { widthY, yIntercept } = this.lineFunction;
+
+    const yByQuadrant = {
+      [Quadrant.First]: 0,
+      [Quadrant.Second]: widthY,
+      [Quadrant.Third]: innerHeight,
+      [Quadrant.Fourth]: yIntercept,
+    };
+
+    return yByQuadrant[this.quadrant];
+  }
+}
+
+class Main extends Canvas {
+  lines: Line[];
+  unblurredLines = 0;
+
+  constructor() {
+    super();
+
+    this.lines = Array.from({ length: 10 }, () => this.generateLine());
+
+    this.drawLines();
+  }
+
+  generateLine() {
+    const line = new Line();
+
+    if (this.unblurredLines < 3) {
+      line.blur = 0;
+      this.unblurredLines += 1;
     }
 
-    lines[index] = generateLine();
+    return line;
+  }
+
+  drawLines() {
+    this.ctx.clearRect(0, 0, this.width, this.heigth);
+
+    this.lines.map((lineEntity, index) => {
+      lineEntity.draw(this.ctx);
+
+      if (lineEntity.isOutOfScreen()) {
+        if (lineEntity.blur === 0) {
+          this.unblurredLines -= 1;
+        }
+        this.lines[index] = this.generateLine();
+      }
+    });
+
+    requestAnimationFrame(() => {
+      this.drawLines();
+    });
   }
 }
 
-function main() {
-  if (!canvas) {
-    return;
-  }
-
-  const scale = window.devicePixelRatio;
-  canvas.width = Math.floor(window.innerWidth * scale);
-  canvas.height = Math.floor(window.innerHeight * scale);
-
-  lines.map(drawLine);
-
-  requestAnimationFrame(main);
-}
-
-requestAnimationFrame(main);
+window.onload = () => {
+  new Main();
+};
