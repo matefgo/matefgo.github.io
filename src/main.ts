@@ -1,6 +1,8 @@
-import "./style.css";
-import { Canvas } from "./common/canvas";
-import { Quadrant } from "./types/main";
+import { Canvas } from "./common/classes/canvas";
+import { navLinkButtonListener } from "./common/functions/listeners";
+import "./common/styles/layout.css";
+import { Quadrant } from "./common/types/main";
+import "/style.css";
 
 class Line {
   x: number;
@@ -192,12 +194,13 @@ class Main extends Canvas {
       }
     });
 
-    requestAnimationFrame(() => {
+    this.animateCanvas(() => {
       this.drawLines();
     });
   }
 }
 
 window.onload = () => {
+  navLinkButtonListener();
   new Main();
 };

@@ -1,0 +1,212 @@
+:root {
+  font-family: "Jetbrains Mono";
+}
+
+body {
+  margin: unset;
+  overflow: hidden;
+}
+
+#app {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  position: fixed;
+
+  overflow: auto;
+
+  padding: 2rem;
+
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+nav > ul {
+  margin: unset;
+  padding: unset;
+
+  gap: 1rem;
+  display: flex;
+}
+
+.main-link {
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+}
+
+.main-link:hover {
+  text-decoration: underline;
+}
+
+.main-link span {
+  gap: 0.5rem;
+  display: flex;
+  align-items: baseline;
+}
+
+h1 {
+  margin: unset;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+h3 {
+  margin: unset;
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-family: "Jaldi";
+}
+
+.main-link span svg {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.blink {
+  width: inherit;
+  height: inherit;
+  fill: black;
+  animation: blink 2s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.nav-link {
+  max-width: 2rem;
+
+  display: flex;
+  align-items: flex-end;
+
+  transition: max-width 1s;
+}
+
+.nav-link:has(.active) {
+  max-width: 7.5rem;
+}
+
+.nav-link button {
+  z-index: 1;
+  border: none;
+  padding: unset;
+  background-color: unset;
+}
+
+.nav-link a {
+  opacity: 0;
+  transform: translateX(-2rem);
+
+  pointer-events: none;
+  text-decoration: none;
+
+  transition: transform 1s, opacity 0.3s;
+}
+
+.nav-link svg {
+  width: 2rem;
+  height: 2rem;
+
+  transition: all 1s;
+}
+
+.nav-link a svg {
+  display: none;
+}
+
+.nav-link svg rect {
+  width: inherit;
+  height: inherit;
+}
+
+.nav-link .active svg {
+  border-radius: 100%;
+  transform: rotate(180deg);
+}
+
+.nav-link .active ~ a {
+  opacity: 1;
+  pointer-events: initial;
+  transform: translateX(0.5rem);
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+}
+
+@media screen and (min-width: 768px) {
+  #app {
+    padding: unset;
+    overflow: hidden;
+    justify-content: space-between;
+  }
+
+  header {
+    padding: 3rem 3rem 0;
+  }
+
+  nav {
+    order: 3;
+    padding: 0 3rem 3rem;
+  }
+
+  main {
+    padding: 0 3rem;
+
+    overflow: auto;
+  }
+
+  nav > ul {
+    flex-direction: column;
+  }
+
+  .nav-link a {
+    opacity: 1;
+    transform: unset;
+
+    gap: 0.5rem;
+    display: inline-flex;
+    align-items: flex-end;
+
+    pointer-events: initial;
+    transition: unset;
+  }
+
+  .nav-link .active ~ a {
+    transform: unset;
+  }
+
+  .nav-link button {
+    display: none;
+  }
+
+  .nav-link a svg {
+    z-index: 1;
+    display: inline-block;
+  }
+
+  .nav-link a span {
+    opacity: 0;
+    transform: translateX(-3rem);
+    transition: opacity 0.3s, transform 1s;
+  }
+
+  .nav-link:hover span {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .nav-link:hover svg {
+    border-radius: 100%;
+    transform: rotate(180deg);
+  }
+}

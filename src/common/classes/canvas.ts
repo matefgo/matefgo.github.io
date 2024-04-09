@@ -23,4 +23,8 @@ export class Canvas {
       this.ctx.scale(devicePixelRatio, devicePixelRatio);
     }
   }
+
+  animateCanvas(callback: FrameRequestCallback) {
+    requestAnimationFrame(callback);
+  }
 }
