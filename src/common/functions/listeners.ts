@@ -1,8 +1,11 @@
-export function navLinkButtonListener() {
-  const buttons = document.querySelectorAll(".nav-link button");
+type NavLinkButtonListenerAction = "add" | "remove";
+
+export function navLinkButtonListener(action: NavLinkButtonListenerAction) {
+  const buttons =
+    document.querySelectorAll<HTMLButtonElement>(".nav-link button");
 
   buttons.forEach((button) => {
-    button.addEventListener("click", () => {
+    const listener = () => {
       const isActive = button.classList.contains("active");
 
       if (isActive) {
@@ -13,6 +16,13 @@ export function navLinkButtonListener() {
         });
         button.classList.add("active");
       }
-    });
+    };
+
+    if (action === "remove") {
+      button.removeEventListener("click", listener);
+      return;
+    }
+
+    button.addEventListener("click", listener);
   });
 }

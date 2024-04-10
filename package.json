@@ -5,11 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite serve",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "typescript": "^5.2.2",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@swup/parallel-plugin": "^0.4.0",
+    "swup": "^4.6.1"
   }
 }

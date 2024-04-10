@@ -1,27 +1,43 @@
-.main-link {
+.about .main-link {
   color: white;
 }
 
-.blink {
+.about .blink {
   fill: white;
 }
 
-.nav-link {
+.about .nav-link {
   color: white;
 }
 
-.nav-link svg rect {
+.about .nav-link a:active {
+  color: white;
+}
+
+.about .nav-link a:visited {
+  color: white;
+}
+
+.about .nav-link svg rect {
   fill: white;
 }
 
-.nav-link:nth-child(3) svg rect {
+.about .nav-link:nth-child(3) svg rect {
   fill: #3d3d3d;
 }
 
-.nav-link:nth-child(4) svg rect {
+.about .nav-link:nth-child(4) svg rect {
   fill: #636363;
 }
 
-.nav-link:nth-child(5) svg rect {
+.about .nav-link:nth-child(5) svg rect {
   fill: #b9b9b9;
+}
+
+.about main {
+  color: white;
+}
+
+.about canvas {
+  background-color: rgb(32, 33, 59);
 }

@@ -1,0 +1,45 @@
+html {
+  --origin-x: calc(var(--x-corner, 50vh) * 1px + 1rem);
+  --origin-y: calc(var(--y-corner, 50vh) * 1px + 1rem);
+}
+
+.is-changing .transition-reveal {
+  transition: clip-path 1s ease-in-out;
+}
+
+.transition-reveal {
+  z-index: 1;
+  clip-path: circle(200% at var(--origin-x) var(--origin-y));
+}
+
+.transition-reveal.is-next-container {
+  clip-path: circle(1rem at var(--origin-x) var(--origin-y));
+}
+
+.transition-reveal.is-previous-container {
+  z-index: 0;
+}
+
+html.to-home {
+  --half-square-size: calc(var(--square-size) / 2);
+  --final-x: calc(var(--x-corner) * 1px + 0.25rem);
+  --final-y: calc(var(--y-corner) * 1px + 0.25rem);
+  --start-x: calc(var(--final-x) - var(--half-square-size));
+  --start-y: calc(var(--final-y) - var(--half-square-size));
+}
+
+.to-home.is-changing .transition-reveal {
+  transition: clip-path 1s ease-in-out;
+}
+
+.to-home .transition-reveal {
+  z-index: 0;
+  clip-path: xywh(
+    var(--start-x) var(--start-y) var(--square-size) var(--square-size)
+  );
+}
+
+.to-home .transition-reveal.is-previous-container {
+  z-index: 1;
+  clip-path: xywh(var(--final-x) var(--final-y) 0% 0%);
+}

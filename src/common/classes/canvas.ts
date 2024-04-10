@@ -1,12 +1,14 @@
-export class Canvas {
-  width = 0;
-  heigth = 0;
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
+export abstract class Canvas {
+  protected width = 0;
+  protected heigth = 0;
+  protected canvas: HTMLCanvasElement;
+  protected ctx: CanvasRenderingContext2D;
+  abstract currentAnimationId: number;
 
-  constructor() {
-    this.canvas = document.querySelector("canvas")!;
-    this.ctx = this.canvas?.getContext("2d")!;
+  constructor(canvasSelector: string) {
+    this.canvas = document.querySelector(canvasSelector) as HTMLCanvasElement;
+
+    this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
     this.setCanvasSize();
 
@@ -15,16 +17,16 @@ export class Canvas {
     };
   }
 
-  setCanvasSize() {
+  abstract animateCanvas(): void;
+
+  abstract stopAnimation(): void;
+
+  private setCanvasSize() {
     if (this.canvas) {
       this.width = this.canvas.width = innerWidth * devicePixelRatio;
       this.heigth = this.canvas.height = innerHeight * devicePixelRatio;
 
       this.ctx.scale(devicePixelRatio, devicePixelRatio);
     }
-  }
-
-  animateCanvas(callback: FrameRequestCallback) {
-    requestAnimationFrame(callback);
   }
 }
