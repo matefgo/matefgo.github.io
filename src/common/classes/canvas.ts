@@ -22,11 +22,9 @@ export abstract class Canvas {
   abstract stopAnimation(): void;
 
   private setCanvasSize() {
-    if (this.canvas) {
-      this.width = this.canvas.width = innerWidth * devicePixelRatio;
-      this.heigth = this.canvas.height = innerHeight * devicePixelRatio;
+    this.ctx.scale(devicePixelRatio, devicePixelRatio);
 
-      this.ctx.scale(devicePixelRatio, devicePixelRatio);
-    }
+    this.width = this.canvas.width = innerWidth * devicePixelRatio;
+    this.heigth = this.canvas.height = innerHeight * devicePixelRatio;
   }
 }
