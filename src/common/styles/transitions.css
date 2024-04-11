@@ -1,6 +1,6 @@
 html {
-  --origin-x: calc(var(--x-corner, 50vh) * 1px + 1rem);
-  --origin-y: calc(var(--y-corner, 50vh) * 1px + 1rem);
+  --origin-x: calc(var(--x-corner) * 1px + 1rem);
+  --origin-y: calc(var(--y-corner) * 1px + 1rem);
 }
 
 .is-changing .transition-reveal {
@@ -13,7 +13,7 @@ html {
 }
 
 .transition-reveal.is-next-container {
-  clip-path: circle(1rem at var(--origin-x) var(--origin-y));
+  clip-path: circle(0rem at var(--origin-x) var(--origin-y));
 }
 
 .transition-reveal.is-previous-container {

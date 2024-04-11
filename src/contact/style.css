@@ -1,0 +1,43 @@
+.contact .main-link {
+  color: white;
+}
+
+.contact .blink {
+  fill: white;
+}
+
+.contact .nav-link {
+  color: white;
+}
+
+.contact .nav-link a:active {
+  color: white;
+}
+
+.contact .nav-link a:visited {
+  color: white;
+}
+
+.contact .nav-link svg rect {
+  fill: white;
+}
+
+.contact .nav-link:nth-child(3) svg rect {
+  fill: #3d3d3d;
+}
+
+.contact .nav-link:nth-child(4) svg rect {
+  fill: #636363;
+}
+
+.contact .nav-link:nth-child(5) svg rect {
+  fill: #b9b9b9;
+}
+
+.contact main {
+  color: white;
+}
+
+.contact canvas {
+  background-color: rgb(54, 32, 59);
+}

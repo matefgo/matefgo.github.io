@@ -1,0 +1,43 @@
+.story .main-link {
+  color: white;
+}
+
+.story .blink {
+  fill: white;
+}
+
+.story .nav-link {
+  color: white;
+}
+
+.story .nav-link a:active {
+  color: white;
+}
+
+.story .nav-link a:visited {
+  color: white;
+}
+
+.story .nav-link svg rect {
+  fill: white;
+}
+
+.story .nav-link:nth-child(3) svg rect {
+  fill: #3d3d3d;
+}
+
+.story .nav-link:nth-child(4) svg rect {
+  fill: #636363;
+}
+
+.story .nav-link:nth-child(5) svg rect {
+  fill: #b9b9b9;
+}
+
+.story main {
+  color: white;
+}
+
+.story canvas {
+  background-color: rgb(35, 59, 32);
+}

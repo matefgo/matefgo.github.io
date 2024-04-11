@@ -6,6 +6,9 @@ import { navLinkButtonListener } from "./common/functions/listeners";
 import "./common/styles/layout.css";
 import "./common/styles/transitions.css";
 import "./style.css";
+import { Portfolio } from "./portfolio/portfolio";
+import { Contact } from "./contact/contact";
+import { Story } from "./story/story";
 
 const swup = new Swup({
   plugins: [new SwupParallelPlugin()],
@@ -14,6 +17,9 @@ const swup = new Swup({
 const classByRoutes = {
   "/": MainPage,
   "/about/": About,
+  "/portfolio/": Portfolio,
+  "/story/": Story,
+  "/contact/": Contact,
 };
 
 type Routes = keyof typeof classByRoutes;
