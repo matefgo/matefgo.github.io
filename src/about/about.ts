@@ -72,23 +72,20 @@ export class About extends Canvas {
 
       finalY += ratio - currentRadius + this.distortionRadius;
 
-      const waveDistortion = this.waveDistortion(
-        this.distortionRadius,
-        currentRadius
-      );
+      const waveDistortion = this.waveDistortion(this.distortionRadius);
 
       this.ctx.rect(finalX, finalY - waveDistortion, this.size, this.size);
 
       return;
     }
 
-    const waveDistortion = this.waveDistortion(distance, currentRadius);
+    const waveDistortion = this.waveDistortion(distance);
 
     this.ctx.rect(finalX, finalY - waveDistortion, this.size, this.size);
   }
 
-  waveDistortion(distance: number, radius: number) {
-    const ratio = (2 * distance) / radius;
+  waveDistortion(distance: number) {
+    const ratio = (2 * distance) / (this.distortionRadius * 1.66);
 
     const angularFactor = Math.cos(2 * Math.PI * ratio + this.dynamicAngle);
 
@@ -96,50 +93,65 @@ export class About extends Canvas {
   }
 
   circleOverlay() {
-    this.ctx.beginPath();
+    const waveDistortion = this.waveDistortion(this.distortionRadius);
 
-    const gradient = this.ctx.createRadialGradient(
-      this.mouseX,
-      this.mouseY,
-      this.distortionRadius,
-      this.mouseX,
-      this.mouseY + 300,
-      this.distortionRadius
-    );
-    gradient.addColorStop(0, "rgba(255,255, 255, 0.15)");
-    gradient.addColorStop(1, "rgba(255,255, 255, 0)");
+    this.ctx.save();
 
-    this.ctx.fillStyle = gradient;
-    this.ctx.filter = "blur(30px)";
+    this.ctx.filter = "blur(200px)";
+    this.ctx.globalCompositeOperation = "source-over";
+    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 60%)`;
 
     this.ctx.arc(
       this.mouseX,
-      this.mouseY - 25,
+      this.mouseY - waveDistortion,
       this.distortionRadius,
       0,
       2 * Math.PI
     );
 
     this.ctx.fill();
-    this.ctx.closePath();
+
+    this.ctx.restore();
+
+    this.ctx.save();
+
+    this.ctx.filter = "blur(60px)";
+    this.ctx.globalCompositeOperation = "overlay";
+    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 100%)`;
+
+    this.ctx.beginPath();
+
+    this.ctx.arc(
+      this.mouseX,
+      this.mouseY - waveDistortion,
+      this.distortionRadius,
+      (215 * Math.PI) / 180,
+      (325 * Math.PI) / 180
+    );
+
+    this.ctx.fill();
+
+    this.ctx.filter = "blur(80px)";
+    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 50%, 25%)`;
+
+    this.ctx.beginPath();
+
+    this.ctx.arc(
+      this.mouseX,
+      this.mouseY - waveDistortion,
+      this.distortionRadius,
+      (15 * Math.PI) / 180,
+      (165 * Math.PI) / 180
+    );
+
+    this.ctx.fill();
+    this.ctx.restore();
   }
 
   handleBackground() {
     this.ctx.clearRect(0, 0, this.width, this.heigth);
 
-    const gradient = this.ctx.createRadialGradient(
-      this.mouseX,
-      this.mouseY,
-      0,
-      this.mouseX,
-      this.mouseY,
-      Math.max((4 * this.width) / 7, (4 * this.heigth) / 7)
-    );
-
-    gradient.addColorStop(0, `hsl(${this.dynamicAngle}, 65%, 30%)`);
-    gradient.addColorStop(1, `hsl(${this.dynamicAngle}, 65%, 5%)`);
-
-    this.ctx.fillStyle = gradient;
+    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 5%)`;
 
     this.ctx.fillRect(0, 0, this.width, this.heigth);
 
@@ -178,11 +190,7 @@ export class About extends Canvas {
   }
 
   drawSquares() {
-    this.ctx.save();
-
     this.handleBackground();
-
-    this.ctx.restore();
 
     this.ctx.fillStyle = "white";
     this.ctx.globalCompositeOperation = "overlay";
@@ -194,8 +202,6 @@ export class About extends Canvas {
     }
 
     this.ctx.fill();
-
-    this.ctx.closePath();
 
     this.handleMouseMove();
 
