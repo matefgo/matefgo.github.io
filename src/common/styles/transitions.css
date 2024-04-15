@@ -3,21 +3,39 @@ html {
   --origin-y: calc(var(--y-corner) * 1px + 1rem);
 }
 
-.is-changing .transition-reveal {
-  transition: clip-path 1s ease-in-out;
-}
-
-.transition-reveal {
+html:not(.to-home).is-changing .transition-reveal {
   z-index: 1;
-  clip-path: circle(200% at var(--origin-x) var(--origin-y));
+  animation: circular-reveal 2.5s;
 }
 
-.transition-reveal.is-next-container {
-  clip-path: circle(0rem at var(--origin-x) var(--origin-y));
+html:not(.to-home).is-changing
+  .transition-reveal:not(.is-previous-container)
+  .origin {
+  opacity: 0;
+  animation: hide-origin 2s 1.25s;
 }
 
-.transition-reveal.is-previous-container {
+@keyframes circular-reveal {
+  0% {
+    clip-path: circle(0rem at var(--origin-x) var(--origin-y));
+  }
+  40% {
+    clip-path: circle(1.5rem at var(--origin-x) var(--origin-y));
+  }
+  100% {
+    clip-path: circle(150% at var(--origin-x) var(--origin-y));
+  }
+}
+
+@keyframes hide-origin {
+  to {
+    opacity: 1;
+  }
+}
+
+html:not(.to-home) .transition-reveal.is-previous-container {
   z-index: 0;
+  animation: unset;
 }
 
 html.to-home {
@@ -28,18 +46,14 @@ html.to-home {
   --start-y: calc(var(--final-y) - var(--half-square-size));
 }
 
-.to-home.is-changing .transition-reveal {
-  transition: clip-path 1s ease-in-out;
-}
-
-.to-home .transition-reveal {
-  z-index: 0;
+html.to-home.is-changing .transition-reveal {
   clip-path: xywh(
     var(--start-x) var(--start-y) var(--square-size) var(--square-size)
   );
+
+  transition: clip-path 1s ease-in-out;
 }
 
-.to-home .transition-reveal.is-previous-container {
-  z-index: 1;
+html.to-home .transition-reveal.is-previous-container {
   clip-path: xywh(var(--final-x) var(--final-y) 0% 0%);
 }

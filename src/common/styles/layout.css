@@ -225,4 +225,13 @@ h3 {
     border-radius: 100%;
     transform: rotate(180deg);
   }
+
+  .nav-link:is(.origin) a span {
+    opacity: 1;
+    transform: unset;
+  }
+
+  .nav-link:is(.origin) svg {
+    border-radius: 100%;
+  }
 }
