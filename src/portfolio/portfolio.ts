@@ -6,10 +6,11 @@ class Drop {
   size: number;
   velocity = 0;
   acceleration: number;
+  hasStopped = false;
 
   constructor() {
     this.x = Math.random();
-    this.acceleration = Math.random() * 0.01 + 0.1;
+    this.acceleration = Math.random() * 0.01 + 0.01;
     this.size = Math.round(Math.random() * 45 + 5);
   }
 
@@ -24,60 +25,33 @@ class Drop {
 
     ctx.beginPath();
 
-    ctx.moveTo(x - radius, 0);
+    ctx.moveTo(x - this.size, 0);
 
-    ctx.arcTo(x, 0, x, radius, radius);
-    ctx.arcTo(x, 0, x + radius, 0, radius);
+    ctx.bezierCurveTo(
+      x,
+      0,
+      x - radius / 2,
+      this.size,
+      x - radius,
+      this.size + currentHeight
+    );
+    ctx.arc(
+      x,
+      this.size + currentHeight,
+      radius,
+      (210 * Math.PI) / 180,
+      (-20 * Math.PI) / 180,
+      true
+    );
+    ctx.bezierCurveTo(x + radius / 2, this.size, x, 0, x + this.size, 0);
 
     ctx.fill();
 
     ctx.closePath();
-
-    ctx.beginPath();
-
-    ctx.moveTo(x, currentHeight);
-    ctx.bezierCurveTo(
-      x - radius / 4,
-      currentHeight + radius / 2,
-      x - radius,
-      currentHeight + radius,
-      x - radius,
-      currentHeight + 2 * radius
-    );
-    ctx.arcTo(
-      x - radius,
-      currentHeight + 3 * radius,
-      x,
-      currentHeight + 3 * radius,
-      radius
-    );
-    ctx.arcTo(
-      x + radius,
-      currentHeight + 3 * radius,
-      x + radius,
-      currentHeight + radius,
-      radius
-    );
-    ctx.bezierCurveTo(
-      x + radius,
-      currentHeight + radius,
-      x + radius / 4,
-      currentHeight + radius / 2,
-      x,
-      currentHeight
-    );
-
-    ctx.fill();
-
-    ctx.closePath();
-
-    ctx.beginPath();
-    ctx.fillStyle = "white";
-
-    ctx.fill();
 
     if (currentHeight > ctx.canvas.clientHeight) {
-      this.velocity = 0;
+      this.acceleration = 0;
+      this.hasStopped = true;
     }
   }
 }
@@ -85,24 +59,27 @@ class Drop {
 export class Portfolio extends Canvas {
   angle = 0;
   currentAnimationId = 0;
-  backgroundColor = "hsl(219, 100%, 11%)";
-  liquidColor = `hsl(${219 - 180}, 100%, 50%)`;
+  backgroundColor = "hsl(219, 50%, 11%)";
+  liquidColor = `hsl(${219}, 50%, 50%)`;
+  liquidDisplacement = this.heigth;
 
   drops: Drop[] = [];
 
   constructor() {
     super(".portfolio canvas");
 
+    this.generateDrops();
+
+    this.drawDrops();
+  }
+
+  generateDrops() {
     const dropCount = 7 * Math.random() + 3;
 
     this.drops = Array.from({ length: dropCount }, () => {
       return new Drop();
     });
-
-    this.drawDrops();
   }
-
-  liquidDisplacement = this.heigth;
 
   liquidFilling() {
     this.ctx.fillStyle = this.liquidColor;
@@ -133,14 +110,16 @@ export class Portfolio extends Canvas {
     this.ctx.fill();
     this.ctx.closePath();
 
-    this.angle += 5;
-    this.liquidDisplacement -= 1;
+    this.angle += 3;
+    this.liquidDisplacement -= 0.1;
 
-    if (this.liquidDisplacement === 0) {
+    if (this.liquidDisplacement < -50) {
       this.liquidDisplacement = this.heigth;
       const temp = this.backgroundColor;
       this.backgroundColor = this.liquidColor;
       this.liquidColor = temp;
+
+      this.generateDrops();
     }
   }
 
@@ -155,7 +134,9 @@ export class Portfolio extends Canvas {
       drop.draw(this.ctx, this.liquidColor);
     }
 
-    this.liquidFilling();
+    if (this.drops.some((drop) => drop.hasStopped)) {
+      this.liquidFilling();
+    }
 
     this.animateCanvas();
   }
