@@ -1,7 +1,7 @@
 import { Canvas } from "../common/classes/canvas";
 import "./style.css";
 
-type Rect = {
+type Square = {
   x: number;
   y: number;
 };
@@ -9,8 +9,8 @@ type Rect = {
 export class About extends Canvas {
   currentAnimationId = 0;
 
-  mouseX = this.width / 2;
-  mouseY = this.heigth / 2;
+  mouseX = Math.floor(this.width / 2);
+  mouseY = Math.floor(this.heigth / 2);
 
   realMouseX = this.width / 2;
   realMouseY = this.heigth / 2;
@@ -19,24 +19,28 @@ export class About extends Canvas {
 
   size = 3;
   spacing = 12;
-  distortionRadius = 300;
+  distortionRadius = Math.max(this.width / 6, 200);
   dynamicAngle = Math.random() * 360;
 
-  rectangles: Rect[] = [];
+  squares: Square[] = [];
+
+  sphere: HTMLDivElement;
 
   constructor() {
     super(".about canvas");
 
+    this.sphere = document.querySelector("#sphere") as HTMLDivElement;
+
     document.addEventListener("mousemove", (event) => {
-      this.realMouseX = event.clientX * devicePixelRatio;
-      this.realMouseY = event.clientY * devicePixelRatio;
+      this.realMouseX = event.x;
+      this.realMouseY = event.y;
 
       this.sphereDisplacementFactor = 0;
     });
 
     this.defineSquareList();
 
-    this.drawSquares();
+    this.drawScene();
   }
 
   defineSquareList() {
@@ -49,16 +53,14 @@ export class About extends Canvas {
       for (let i = 0; i < widthRatio; i++) {
         const x = (2 * i - 1) * this.spacing;
 
-        this.rectangles.push({ x, y });
+        this.squares.push({ x, y });
       }
     }
   }
 
-  defineRectPath(rect: Rect) {
-    const displacement = this.size / 2;
-
-    let finalX = rect.x + displacement;
-    let finalY = rect.y + displacement;
+  defineSquarePath(rect: Square) {
+    let finalX = rect.x;
+    let finalY = rect.y;
 
     const dX = this.mouseX - finalX;
     const dY = this.mouseY - finalY;
@@ -70,7 +72,7 @@ export class About extends Canvas {
     if (distance < this.distortionRadius) {
       const ratio = distance ** 2 / currentRadius;
 
-      finalY += ratio - currentRadius + this.distortionRadius;
+      finalY += Math.floor(ratio - currentRadius + this.distortionRadius);
 
       const waveDistortion = this.waveDistortion(this.distortionRadius);
 
@@ -87,86 +89,11 @@ export class About extends Canvas {
   waveDistortion(distance: number) {
     const ratio = (2 * distance) / (this.distortionRadius * 1.66);
 
-    const angularFactor = Math.cos(2 * Math.PI * ratio + this.dynamicAngle);
-
-    return 100 * Math.exp(-ratio) * angularFactor;
-  }
-
-  circleOverlay() {
-    const waveDistortion = this.waveDistortion(this.distortionRadius);
-
-    this.ctx.save();
-
-    this.ctx.filter = "blur(200px)";
-    this.ctx.globalCompositeOperation = "source-over";
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 60%)`;
-
-    this.ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      0,
-      2 * Math.PI
+    const angularFactor = Math.cos(
+      2 * Math.PI * ratio + this.dynamicAngle / 100
     );
 
-    this.ctx.fill();
-
-    this.ctx.restore();
-
-    this.ctx.save();
-
-    this.ctx.filter = "blur(60px)";
-    this.ctx.globalCompositeOperation = "overlay";
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 100%)`;
-
-    this.ctx.beginPath();
-
-    this.ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      (215 * Math.PI) / 180,
-      (325 * Math.PI) / 180
-    );
-
-    this.ctx.fill();
-
-    this.ctx.filter = "blur(80px)";
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 50%, 25%)`;
-
-    this.ctx.beginPath();
-
-    this.ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      (15 * Math.PI) / 180,
-      (165 * Math.PI) / 180
-    );
-
-    this.ctx.fill();
-    this.ctx.restore();
-  }
-
-  handleBackground() {
-    this.ctx.clearRect(0, 0, this.width, this.heigth);
-
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 5%)`;
-
-    this.ctx.fillRect(0, 0, this.width, this.heigth);
-
-    this.circleOverlay();
-
-    this.dynamicAngle += 0.01;
-
-    if (this.dynamicAngle >= 360) {
-      this.dynamicAngle = 0;
-    }
-
-    document.documentElement.style.setProperty(
-      "--color-angle",
-      `${this.dynamicAngle}`
-    );
+    return Math.floor(100 * Math.exp(-ratio) * angularFactor);
   }
 
   handleMouseMove() {
@@ -186,22 +113,55 @@ export class About extends Canvas {
     this.mouseX += ratio * dX;
     this.mouseY += ratio * dY;
 
+    this.sphere.style.top =
+      Math.floor(this.mouseY - this.distortionRadius) + "px";
+    this.sphere.style.left =
+      Math.floor(this.mouseX - this.distortionRadius) + "px";
+
     this.sphereDisplacementFactor += 1;
   }
 
   drawSquares() {
-    this.handleBackground();
+    this.ctx.clearRect(0, 0, this.width, this.heigth);
 
     this.ctx.fillStyle = "white";
     this.ctx.globalCompositeOperation = "overlay";
 
     this.ctx.beginPath();
 
-    for (const rect of this.rectangles) {
-      this.defineRectPath(rect);
+    for (const rect of this.squares) {
+      this.defineSquarePath(rect);
     }
 
     this.ctx.fill();
+  }
+
+  defineColorAngle() {
+    this.dynamicAngle += 1;
+
+    if (this.dynamicAngle >= 36000) {
+      this.dynamicAngle = 0;
+    }
+
+    document.documentElement.style.setProperty(
+      "--color-angle",
+      `${Math.floor(this.dynamicAngle / 100)}`
+    );
+  }
+
+  defineRadiusProperty() {
+    document.documentElement.style.setProperty(
+      "--diameter",
+      `${Math.floor(2 * this.distortionRadius)}px`
+    );
+  }
+
+  drawScene() {
+    this.drawSquares();
+
+    this.defineColorAngle();
+
+    this.defineRadiusProperty();
 
     this.handleMouseMove();
 
@@ -210,7 +170,7 @@ export class About extends Canvas {
 
   animateCanvas() {
     this.currentAnimationId = requestAnimationFrame(() => {
-      this.drawSquares();
+      this.drawScene();
     });
   }
 

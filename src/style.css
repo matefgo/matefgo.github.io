@@ -37,3 +37,7 @@
 .main {
   background-color: white;
 }
+
+.main canvas {
+  filter: blur(3px);
+}

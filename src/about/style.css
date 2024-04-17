@@ -1,3 +1,7 @@
+.about {
+  overflow: hidden;
+}
+
 .about .main-link {
   color: white;
 }
@@ -36,4 +40,23 @@
 
 .about main {
   color: white;
+}
+
+.about #background {
+  grid-area: app;
+  position: relative;
+  background-color: hsl(var(--color-angle), 100%, 15%);
+}
+
+.about #sphere {
+  overflow: hidden;
+  width: var(--diameter);
+  height: var(--diameter);
+  border-radius: 100%;
+  position: absolute;
+  background-color: hsl(var(--color-angle), 100%, 60%);
+}
+
+.about #squares {
+  mix-blend-mode: overlay;
 }
