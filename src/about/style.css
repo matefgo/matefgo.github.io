@@ -46,19 +46,25 @@
 
 .about #background #sphere {
   grid-area: bg;
+
+  -webkit-filter: blur(200px);
   filter: blur(200px);
 }
 
 .about #background #glow {
   grid-area: bg;
-  filter: blur(60px);
   mix-blend-mode: overlay;
+
+  -webkit-filter: blur(60px);
+  filter: blur(60px);
 }
 
 .about #background #shadow {
   grid-area: bg;
-  filter: blur(80px);
   mix-blend-mode: overlay;
+
+  -webkit-filter: blur(80px);
+  filter: blur(80px);
 }
 
 .about #background #squares {
