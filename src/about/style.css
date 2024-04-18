@@ -37,3 +37,31 @@
 .about main {
   color: white;
 }
+
+.about #background {
+  display: grid;
+  grid-template-areas: "bg";
+  background-color: hsl(var(--color-angle), 100%, 5%);
+}
+
+.about #background #sphere {
+  grid-area: bg;
+  filter: blur(200px);
+}
+
+.about #background #glow {
+  grid-area: bg;
+  filter: blur(60px);
+  mix-blend-mode: overlay;
+}
+
+.about #background #shadow {
+  grid-area: bg;
+  filter: blur(80px);
+  mix-blend-mode: overlay;
+}
+
+.about #background #squares {
+  grid-area: bg;
+  mix-blend-mode: overlay;
+}

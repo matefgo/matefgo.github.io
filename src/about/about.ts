@@ -1,7 +1,7 @@
 import { Canvas } from "../common/classes/canvas";
 import "./style.css";
 
-type Rect = {
+type Square = {
   x: number;
   y: number;
 };
@@ -20,23 +20,23 @@ export class About extends Canvas {
   size = 3;
   spacing = 12;
   distortionRadius = 300;
-  dynamicAngle = Math.random() * 360;
+  dynamicAngle = Math.random() * 36000;
 
-  rectangles: Rect[] = [];
+  squares: Square[] = [];
 
   constructor() {
-    super(".about canvas");
+    super(".about #background #squares");
 
     document.addEventListener("mousemove", (event) => {
-      this.realMouseX = event.clientX * devicePixelRatio;
-      this.realMouseY = event.clientY * devicePixelRatio;
+      this.realMouseX = event.clientX;
+      this.realMouseY = event.clientY;
 
       this.sphereDisplacementFactor = 0;
     });
 
     this.defineSquareList();
 
-    this.drawSquares();
+    this.drawScene();
   }
 
   defineSquareList() {
@@ -49,12 +49,12 @@ export class About extends Canvas {
       for (let i = 0; i < widthRatio; i++) {
         const x = (2 * i - 1) * this.spacing;
 
-        this.rectangles.push({ x, y });
+        this.squares.push({ x, y });
       }
     }
   }
 
-  defineRectPath(rect: Rect) {
+  defineRectPath(rect: Square) {
     const displacement = this.size / 2;
 
     let finalX = rect.x + displacement;
@@ -87,56 +87,25 @@ export class About extends Canvas {
   waveDistortion(distance: number) {
     const ratio = (2 * distance) / (this.distortionRadius * 1.66);
 
-    const angularFactor = Math.cos(2 * Math.PI * ratio + this.dynamicAngle);
+    const angularFactor = Math.cos(
+      2 * Math.PI * ratio + this.dynamicAngle / 100
+    );
 
     return 100 * Math.exp(-ratio) * angularFactor;
   }
 
-  circleOverlay() {
-    const waveDistortion = this.waveDistortion(this.distortionRadius);
+  drawShadow(waveDistortion: number) {
+    const canvas = document.querySelector("#shadow") as HTMLCanvasElement;
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    this.ctx.save();
+    canvas.width = this.width;
+    canvas.height = this.heigth;
 
-    this.ctx.filter = "blur(200px)";
-    this.ctx.globalCompositeOperation = "source-over";
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 60%)`;
+    ctx.clearRect(0, 0, this.width, this.heigth);
 
-    this.ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      0,
-      2 * Math.PI
-    );
+    ctx.fillStyle = `hsl(${this.dynamicAngle / 100}, 50%, 25%)`;
 
-    this.ctx.fill();
-
-    this.ctx.restore();
-
-    this.ctx.save();
-
-    this.ctx.filter = "blur(60px)";
-    this.ctx.globalCompositeOperation = "overlay";
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 100%)`;
-
-    this.ctx.beginPath();
-
-    this.ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      (215 * Math.PI) / 180,
-      (325 * Math.PI) / 180
-    );
-
-    this.ctx.fill();
-
-    this.ctx.filter = "blur(80px)";
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 50%, 25%)`;
-
-    this.ctx.beginPath();
-
-    this.ctx.arc(
+    ctx.arc(
       this.mouseX,
       this.mouseY - waveDistortion,
       this.distortionRadius,
@@ -144,29 +113,59 @@ export class About extends Canvas {
       (165 * Math.PI) / 180
     );
 
-    this.ctx.fill();
-    this.ctx.restore();
+    ctx.fill();
   }
 
-  handleBackground() {
-    this.ctx.clearRect(0, 0, this.width, this.heigth);
+  drawGlow(waveDistortion: number) {
+    const canvas = document.querySelector("#glow") as HTMLCanvasElement;
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
 
-    this.ctx.fillStyle = `hsl(${this.dynamicAngle}, 100%, 5%)`;
+    canvas.width = this.width;
+    canvas.height = this.heigth;
 
-    this.ctx.fillRect(0, 0, this.width, this.heigth);
+    ctx.clearRect(0, 0, this.width, this.heigth);
 
-    this.circleOverlay();
+    ctx.fillStyle = `hsl(${this.dynamicAngle / 100}, 100%, 100%)`;
 
-    this.dynamicAngle += 0.01;
-
-    if (this.dynamicAngle >= 360) {
-      this.dynamicAngle = 0;
-    }
-
-    document.documentElement.style.setProperty(
-      "--color-angle",
-      `${this.dynamicAngle}`
+    ctx.arc(
+      this.mouseX,
+      this.mouseY - waveDistortion,
+      this.distortionRadius,
+      (215 * Math.PI) / 180,
+      (325 * Math.PI) / 180
     );
+
+    ctx.fill();
+  }
+
+  drawSphere(waveDistortion: number) {
+    const canvas = document.querySelector("#sphere") as HTMLCanvasElement;
+    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+    canvas.width = this.width;
+    canvas.height = this.heigth;
+
+    ctx.clearRect(0, 0, this.width, this.heigth);
+
+    ctx.fillStyle = `hsl(${this.dynamicAngle / 100}, 100%, 60%)`;
+
+    ctx.arc(
+      this.mouseX,
+      this.mouseY - waveDistortion,
+      this.distortionRadius,
+      0,
+      2 * Math.PI
+    );
+
+    ctx.fill();
+  }
+
+  drawSphereItens() {
+    const waveDistortion = this.waveDistortion(this.distortionRadius);
+
+    this.drawSphere(waveDistortion);
+    this.drawGlow(waveDistortion);
+    this.drawShadow(waveDistortion);
   }
 
   handleMouseMove() {
@@ -190,27 +189,44 @@ export class About extends Canvas {
   }
 
   drawSquares() {
-    this.handleBackground();
+    this.ctx.clearRect(0, 0, this.width, this.heigth);
 
     this.ctx.fillStyle = "white";
     this.ctx.globalCompositeOperation = "overlay";
 
     this.ctx.beginPath();
 
-    for (const rect of this.rectangles) {
+    for (const rect of this.squares) {
       this.defineRectPath(rect);
     }
 
     this.ctx.fill();
+  }
+
+  drawScene() {
+    this.drawSphereItens();
+
+    this.drawSquares();
 
     this.handleMouseMove();
+
+    this.dynamicAngle += 1;
+
+    if (this.dynamicAngle >= 36000) {
+      this.dynamicAngle = 0;
+    }
+
+    document.documentElement.style.setProperty(
+      "--color-angle",
+      `${Math.floor(this.dynamicAngle / 100)}`
+    );
 
     this.animateCanvas();
   }
 
   animateCanvas() {
     this.currentAnimationId = requestAnimationFrame(() => {
-      this.drawSquares();
+      this.drawScene();
     });
   }
 
