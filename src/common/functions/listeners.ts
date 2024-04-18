@@ -9,7 +9,8 @@ export function navLinkButtonListener(action: NavLinkButtonListenerAction) {
       const isActive = button.classList.contains("active");
 
       if (isActive) {
-        button.classList.remove("active");
+        const anchor = button.nextElementSibling as HTMLAnchorElement;
+        anchor.click();
       } else {
         buttons.forEach((inactiveButton) => {
           inactiveButton.classList.remove("active");

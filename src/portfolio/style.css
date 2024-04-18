@@ -38,6 +38,6 @@
   color: white;
 }
 
-.portfolio canvas {
+.portfolio #background {
   background-color: rgb(32, 33, 59);
 }

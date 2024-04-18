@@ -1,4 +1,6 @@
-import { Canvas } from "./canvas";
+import { AnimatedPage } from "../common/classes/animatedPage";
+import { Canvas } from "../common/classes/canvas";
+import "./style.css";
 
 export enum Quadrant {
   First = 0,
@@ -12,7 +14,6 @@ export class Line {
   y: number;
   lineFunction: ReturnType<typeof this.defineLineFunction>;
 
-  blur: number;
   size: number;
   displacement = 0;
 
@@ -23,7 +24,6 @@ export class Line {
     this.radians = Math.random() * Math.PI * 2;
     this.quadrant = Math.floor(this.radians / (Math.PI / 2));
 
-    this.blur = Math.floor(Math.random() * 3) + 3;
     this.size = Math.floor(Math.random() * 6000 + 3000);
 
     this.lineFunction = this.defineLineFunction();
@@ -88,7 +88,6 @@ export class Line {
 
   draw(ctx: CanvasRenderingContext2D) {
     const deltaX = this.displacement - this.size;
-    const opacity = this.blur ? 1 - this.blur / 10 : 1;
 
     ctx.translate(this.x, this.y);
     ctx.rotate(this.radians);
@@ -101,7 +100,6 @@ export class Line {
 
     ctx.lineCap = "round";
     ctx.strokeStyle = gradient;
-    ctx.filter = `blur(${this.blur}px) opacity(${opacity})`;
 
     ctx.beginPath();
     ctx.moveTo(deltaX, 0);
@@ -160,50 +158,52 @@ export class Line {
   }
 }
 
-export class MainPage extends Canvas {
-  lines: Line[];
-  unblurredLines = 0;
+export class Main implements AnimatedPage {
   currentAnimationId = 0;
 
+  noBlurCanvas: Canvas;
+  fullBlurCanvas: Canvas;
+  mediumBlurCanvas: Canvas;
+
+  noBlurLines: Line[];
+  fullBlurLines: Line[];
+  mediumBlurLines: Line[];
+
   constructor() {
-    super(".main canvas");
+    this.noBlurLines = Array.from({ length: 4 }, () => new Line());
+    this.fullBlurLines = Array.from({ length: 3 }, () => new Line());
+    this.mediumBlurLines = Array.from({ length: 3 }, () => new Line());
 
-    this.lines = Array.from({ length: 10 }, () => this.generateLine());
+    this.fullBlurCanvas = new Canvas("#full-blur");
+    this.mediumBlurCanvas = new Canvas("#medium-blur");
+    this.noBlurCanvas = new Canvas("#no-blur");
 
-    this.drawLines();
+    this.drawScene();
   }
 
-  generateLine() {
-    const line = new Line();
+  drawLines(linesList: Line[], ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (this.unblurredLines < 3) {
-      line.blur = 0;
-      this.unblurredLines += 1;
-    }
+    linesList.map((line, index) => {
+      line.draw(ctx);
 
-    return line;
-  }
-
-  drawLines() {
-    this.ctx.clearRect(0, 0, this.width, this.heigth);
-
-    this.lines.map((lineEntity, index) => {
-      lineEntity.draw(this.ctx);
-
-      if (lineEntity.isOutOfScreen()) {
-        if (lineEntity.blur === 0) {
-          this.unblurredLines -= 1;
-        }
-        this.lines[index] = this.generateLine();
+      if (line.isOutOfScreen()) {
+        linesList[index] = new Line();
       }
     });
+  }
+
+  drawScene() {
+    this.drawLines(this.noBlurLines, this.noBlurCanvas.ctx);
+    this.drawLines(this.fullBlurLines, this.fullBlurCanvas.ctx);
+    this.drawLines(this.mediumBlurLines, this.mediumBlurCanvas.ctx);
 
     this.animateCanvas();
   }
 
   animateCanvas() {
     this.currentAnimationId = requestAnimationFrame(() => {
-      this.drawLines();
+      this.drawScene();
     });
   }
 

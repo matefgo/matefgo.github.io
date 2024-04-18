@@ -1,3 +1,4 @@
+import { AnimatedPage } from "../common/classes/animatedPage";
 import { Canvas } from "../common/classes/canvas";
 import "./style.css";
 
@@ -6,26 +7,47 @@ type Square = {
   y: number;
 };
 
-export class About extends Canvas {
+type SphereComponent = {
+  color: string;
+  finalAngle: number;
+  initialAngle: number;
+  waveDistortion: number;
+  ctx: CanvasRenderingContext2D;
+};
+
+export class About implements AnimatedPage {
   currentAnimationId = 0;
 
-  mouseX = this.width / 2;
-  mouseY = this.heigth / 2;
+  mouseX: number;
+  mouseY: number;
 
-  realMouseX = this.width / 2;
-  realMouseY = this.heigth / 2;
-
-  sphereDisplacementFactor = 0;
+  realMouseX: number;
+  realMouseY: number;
 
   size = 3;
   spacing = 12;
   distortionRadius = 300;
+  sphereDisplacementFactor = 0;
   dynamicAngle = Math.random() * 36000;
 
   squares: Square[] = [];
 
+  sphereCanvas: Canvas;
+  glowCanvas: Canvas;
+  shadowCanvas: Canvas;
+  squaresCanvas: Canvas;
+
   constructor() {
-    super(".about #background #squares");
+    this.sphereCanvas = new Canvas("#sphere");
+    this.shadowCanvas = new Canvas("#shadow");
+    this.glowCanvas = new Canvas("#glow");
+    this.squaresCanvas = new Canvas("#squares");
+
+    this.mouseX = window.innerWidth / 2;
+    this.mouseY = window.innerHeight / 2;
+
+    this.realMouseX = window.innerWidth / 2;
+    this.realMouseY = window.innerHeight / 2;
 
     document.addEventListener("mousemove", (event) => {
       this.realMouseX = event.clientX;
@@ -40,8 +62,8 @@ export class About extends Canvas {
   }
 
   defineSquareList() {
-    const widthRatio = Math.floor(this.width / this.spacing);
-    const heigthRatio = Math.floor(this.heigth / this.spacing);
+    const widthRatio = Math.floor(window.innerWidth / this.spacing);
+    const heigthRatio = Math.floor(window.innerHeight / this.spacing);
 
     for (let j = 0; j < heigthRatio; j++) {
       const y = (2 * j - 1) * this.spacing;
@@ -74,14 +96,24 @@ export class About extends Canvas {
 
       const waveDistortion = this.waveDistortion(this.distortionRadius);
 
-      this.ctx.rect(finalX, finalY - waveDistortion, this.size, this.size);
+      this.squaresCanvas.ctx.rect(
+        finalX,
+        finalY - waveDistortion,
+        this.size,
+        this.size
+      );
 
       return;
     }
 
     const waveDistortion = this.waveDistortion(distance);
 
-    this.ctx.rect(finalX, finalY - waveDistortion, this.size, this.size);
+    this.squaresCanvas.ctx.rect(
+      finalX,
+      finalY - waveDistortion,
+      this.size,
+      this.size
+    );
   }
 
   waveDistortion(distance: number) {
@@ -94,67 +126,20 @@ export class About extends Canvas {
     return 100 * Math.exp(-ratio) * angularFactor;
   }
 
-  drawShadow(waveDistortion: number) {
-    const canvas = document.querySelector("#shadow") as HTMLCanvasElement;
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+  drawSphereComponent(params: SphereComponent) {
+    const { ctx, color, waveDistortion, initialAngle, finalAngle } = params;
+    ctx.clearRect(0, 0, this.squaresCanvas.width, this.squaresCanvas.heigth);
 
-    canvas.width = this.width;
-    canvas.height = this.heigth;
+    ctx.fillStyle = color;
 
-    ctx.clearRect(0, 0, this.width, this.heigth);
-
-    ctx.fillStyle = `hsl(${this.dynamicAngle / 100}, 50%, 25%)`;
+    ctx.beginPath();
 
     ctx.arc(
       this.mouseX,
       this.mouseY - waveDistortion,
       this.distortionRadius,
-      (15 * Math.PI) / 180,
-      (165 * Math.PI) / 180
-    );
-
-    ctx.fill();
-  }
-
-  drawGlow(waveDistortion: number) {
-    const canvas = document.querySelector("#glow") as HTMLCanvasElement;
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-    canvas.width = this.width;
-    canvas.height = this.heigth;
-
-    ctx.clearRect(0, 0, this.width, this.heigth);
-
-    ctx.fillStyle = `hsl(${this.dynamicAngle / 100}, 100%, 100%)`;
-
-    ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      (215 * Math.PI) / 180,
-      (325 * Math.PI) / 180
-    );
-
-    ctx.fill();
-  }
-
-  drawSphere(waveDistortion: number) {
-    const canvas = document.querySelector("#sphere") as HTMLCanvasElement;
-    const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-    canvas.width = this.width;
-    canvas.height = this.heigth;
-
-    ctx.clearRect(0, 0, this.width, this.heigth);
-
-    ctx.fillStyle = `hsl(${this.dynamicAngle / 100}, 100%, 60%)`;
-
-    ctx.arc(
-      this.mouseX,
-      this.mouseY - waveDistortion,
-      this.distortionRadius,
-      0,
-      2 * Math.PI
+      initialAngle,
+      finalAngle
     );
 
     ctx.fill();
@@ -163,9 +148,29 @@ export class About extends Canvas {
   drawSphereItens() {
     const waveDistortion = this.waveDistortion(this.distortionRadius);
 
-    this.drawSphere(waveDistortion);
-    this.drawGlow(waveDistortion);
-    this.drawShadow(waveDistortion);
+    this.drawSphereComponent({
+      waveDistortion,
+      initialAngle: 0,
+      finalAngle: 2 * Math.PI,
+      ctx: this.sphereCanvas.ctx,
+      color: `hsl(${this.dynamicAngle / 100}, 100%, 60%)`,
+    });
+
+    this.drawSphereComponent({
+      waveDistortion,
+      ctx: this.glowCanvas.ctx,
+      finalAngle: (325 * Math.PI) / 180,
+      initialAngle: (215 * Math.PI) / 180,
+      color: `hsl(${this.dynamicAngle / 100}, 100%, 100%)`,
+    });
+
+    this.drawSphereComponent({
+      waveDistortion,
+      ctx: this.shadowCanvas.ctx,
+      initialAngle: (15 * Math.PI) / 180,
+      finalAngle: (165 * Math.PI) / 180,
+      color: `hsl(${this.dynamicAngle / 100}, 50%, 25%)`,
+    });
   }
 
   handleMouseMove() {
@@ -189,18 +194,23 @@ export class About extends Canvas {
   }
 
   drawSquares() {
-    this.ctx.clearRect(0, 0, this.width, this.heigth);
+    this.squaresCanvas.ctx.clearRect(
+      0,
+      0,
+      this.squaresCanvas.width,
+      this.squaresCanvas.heigth
+    );
 
-    this.ctx.fillStyle = "white";
-    this.ctx.globalCompositeOperation = "overlay";
+    this.squaresCanvas.ctx.fillStyle = "white";
+    this.squaresCanvas.ctx.globalCompositeOperation = "overlay";
 
-    this.ctx.beginPath();
+    this.squaresCanvas.ctx.beginPath();
 
     for (const rect of this.squares) {
       this.defineRectPath(rect);
     }
 
-    this.ctx.fill();
+    this.squaresCanvas.ctx.fill();
   }
 
   drawScene() {

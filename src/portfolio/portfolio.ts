@@ -1,3 +1,4 @@
+import { AnimatedPage } from "../common/classes/animatedPage";
 import { Canvas } from "../common/classes/canvas";
 import "./style.css";
 
@@ -56,17 +57,21 @@ class Drop {
   }
 }
 
-export class Portfolio extends Canvas {
+export class Portfolio implements AnimatedPage {
   angle = 0;
   currentAnimationId = 0;
   backgroundColor = "hsl(219, 50%, 11%)";
   liquidColor = `hsl(${219}, 50%, 50%)`;
-  liquidDisplacement = this.heigth;
+  liquidDisplacement: number;
 
   drops: Drop[] = [];
 
+  canvas: Canvas;
+
   constructor() {
-    super(".portfolio canvas");
+    this.canvas = new Canvas(".portfolio canvas");
+
+    this.liquidDisplacement = this.canvas.heigth;
 
     this.generateDrops();
 
@@ -82,7 +87,7 @@ export class Portfolio extends Canvas {
   }
 
   liquidFilling() {
-    this.ctx.fillStyle = this.liquidColor;
+    this.canvas.ctx.fillStyle = this.liquidColor;
 
     const radians = (this.angle * Math.PI) / 180;
 
@@ -90,31 +95,31 @@ export class Portfolio extends Canvas {
 
     const heightOscilation = 10 * Math.sin(radians);
 
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, liquidHeigth);
-    this.ctx.quadraticCurveTo(
-      this.width / 4,
+    this.canvas.ctx.beginPath();
+    this.canvas.ctx.moveTo(0, liquidHeigth);
+    this.canvas.ctx.quadraticCurveTo(
+      this.canvas.width / 4,
       liquidHeigth + heightOscilation,
-      this.width / 2,
+      this.canvas.width / 2,
       liquidHeigth
     );
-    this.ctx.quadraticCurveTo(
-      (3 * this.width) / 4,
+    this.canvas.ctx.quadraticCurveTo(
+      (3 * this.canvas.width) / 4,
       liquidHeigth - heightOscilation,
-      this.width,
+      this.canvas.width,
       liquidHeigth
     );
-    this.ctx.lineTo(this.width, this.heigth);
-    this.ctx.lineTo(0, this.heigth);
+    this.canvas.ctx.lineTo(this.canvas.width, this.canvas.heigth);
+    this.canvas.ctx.lineTo(0, this.canvas.heigth);
 
-    this.ctx.fill();
-    this.ctx.closePath();
+    this.canvas.ctx.fill();
+    this.canvas.ctx.closePath();
 
     this.angle += 3;
     this.liquidDisplacement -= 0.1;
 
     if (this.liquidDisplacement < -50) {
-      this.liquidDisplacement = this.heigth;
+      this.liquidDisplacement = this.canvas.heigth;
       const temp = this.backgroundColor;
       this.backgroundColor = this.liquidColor;
       this.liquidColor = temp;
@@ -124,14 +129,14 @@ export class Portfolio extends Canvas {
   }
 
   drawDrops() {
-    this.ctx.clearRect(0, 0, this.width, this.heigth);
+    this.canvas.ctx.clearRect(0, 0, this.canvas.width, this.canvas.heigth);
 
-    this.ctx.fillStyle = this.backgroundColor;
+    this.canvas.ctx.fillStyle = this.backgroundColor;
 
-    this.ctx.fillRect(0, 0, this.width, this.heigth);
+    this.canvas.ctx.fillRect(0, 0, this.canvas.width, this.canvas.heigth);
 
     for (const drop of this.drops) {
-      drop.draw(this.ctx, this.liquidColor);
+      drop.draw(this.canvas.ctx, this.liquidColor);
     }
 
     if (this.drops.some((drop) => drop.hasStopped)) {

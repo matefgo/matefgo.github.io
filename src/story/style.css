@@ -38,6 +38,6 @@
   color: white;
 }
 
-.story canvas {
+.story #background {
   background-color: rgb(35, 59, 32);
 }

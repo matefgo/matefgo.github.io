@@ -1,21 +1,20 @@
 import SwupParallelPlugin from "@swup/parallel-plugin";
 import Swup from "swup";
-import { About } from "./about/about";
-import { MainPage } from "./common/classes/mainPage";
-import { navLinkButtonListener } from "./common/functions/listeners";
-import "./common/styles/layout.css";
-import "./common/styles/transitions.css";
-import "./style.css";
-import { Portfolio } from "./portfolio/portfolio";
-import { Contact } from "./contact/contact";
-import { Story } from "./story/story";
+import { About } from "../../about/about";
+import { Main } from "../../main/main";
+import { navLinkButtonListener } from "./listeners";
+import "../styles/layout.css";
+import "../styles/transitions.css";
+import { Portfolio } from "../../portfolio/portfolio";
+import { Contact } from "../../contact/contact";
+import { Story } from "../../story/story";
 
 const swup = new Swup({
   plugins: [new SwupParallelPlugin()],
 });
 
 const classByRoutes = {
-  "/": MainPage,
+  "/": Main,
   "/about/": About,
   "/portfolio/": Portfolio,
   "/story/": Story,

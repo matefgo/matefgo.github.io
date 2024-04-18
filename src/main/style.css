@@ -37,3 +37,24 @@
 .main {
   background-color: white;
 }
+
+.main #background {
+  display: grid;
+  grid-template-areas: "bg";
+}
+
+.main #background #full-blur {
+  grid-area: bg;
+  filter: blur(6px);
+  opacity: 0.4;
+}
+
+.main #background #medium-blur {
+  grid-area: bg;
+  filter: blur(3px);
+  opacity: 0.7;
+}
+
+.main #background #no-blur {
+  grid-area: bg;
+}

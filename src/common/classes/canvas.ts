@@ -1,9 +1,8 @@
-export abstract class Canvas {
-  protected width = 0;
-  protected heigth = 0;
-  protected canvas: HTMLCanvasElement;
-  protected ctx: CanvasRenderingContext2D;
-  abstract currentAnimationId: number;
+export class Canvas {
+  width = 0;
+  heigth = 0;
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
 
   constructor(canvasSelector: string) {
     this.canvas = document.querySelector(canvasSelector) as HTMLCanvasElement;
@@ -11,20 +10,10 @@ export abstract class Canvas {
     this.ctx = this.canvas.getContext("2d") as CanvasRenderingContext2D;
 
     this.setCanvasSize();
-
-    window.onresize = () => {
-      this.setCanvasSize();
-    };
   }
 
-  abstract animateCanvas(): void;
-
-  abstract stopAnimation(): void;
-
-  private setCanvasSize() {
-    this.ctx.scale(devicePixelRatio, devicePixelRatio);
-
-    this.width = this.canvas.width = innerWidth * devicePixelRatio;
-    this.heigth = this.canvas.height = innerHeight * devicePixelRatio;
+  setCanvasSize() {
+    this.width = this.canvas.width = innerWidth;
+    this.heigth = this.canvas.height = innerHeight;
   }
 }
