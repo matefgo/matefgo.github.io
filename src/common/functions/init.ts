@@ -8,6 +8,7 @@ import "../styles/transitions.css";
 import { Portfolio } from "../../portfolio/portfolio";
 import { Contact } from "../../contact/contact";
 import { Story } from "../../story/story";
+import { replaceMainContent } from "./welcomeText";
 
 const swup = new Swup({
   plugins: [new SwupParallelPlugin()],
@@ -28,6 +29,8 @@ let oldInstance: InstanceType<(typeof classByRoutes)[Routes]>;
 
 document.addEventListener("DOMContentLoaded", () => {
   navLinkButtonListener("add");
+
+  replaceMainContent();
 
   const route = location.pathname as Routes;
 

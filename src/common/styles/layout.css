@@ -8,11 +8,15 @@ body {
 }
 
 #app-container {
+  overflow: hidden;
+
   display: grid;
   grid-template-areas: "app-container";
 }
 
 #swup {
+  overflow: hidden;
+
   display: grid;
   grid-template-areas: "app";
 
@@ -20,7 +24,8 @@ body {
 }
 
 #app {
-  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
 
   gap: 1rem;
   display: flex;
@@ -48,7 +53,22 @@ nav {
 }
 
 main {
-  padding: 0 2rem 2rem;
+  margin: 0 2rem 2rem;
+  overflow: auto;
+}
+
+main.welcome {
+  text-align: center;
+}
+
+main.welcome > h2 {
+  margin-bottom: unset;
+}
+
+main.welcome > p {
+  margin-top: unset;
+  font-size: 1.5rem;
+  font-family: "Jaldi";
 }
 
 nav > ul {
@@ -180,9 +200,7 @@ h3 {
   }
 
   main {
-    padding: 0 3rem;
-
-    overflow: auto;
+    margin: 0 3rem;
   }
 
   nav > ul {

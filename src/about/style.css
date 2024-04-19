@@ -38,6 +38,12 @@
   color: white;
 }
 
+.about main:not(.welcome) {
+  color: black;
+  background-color: rgba(255, 255, 255, 0.384);
+  border-radius: 0.5rem;
+}
+
 .about #background {
   display: grid;
   grid-template-areas: "bg";
