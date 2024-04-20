@@ -39,5 +39,24 @@
 }
 
 .story #background {
-  background-color: rgb(35, 59, 32);
+  display: grid;
+  grid-template-areas: "bg";
+  background: radial-gradient(
+    circle,
+    rgba(25, 25, 25, 1) 0%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+.story #background #axis {
+  grid-area: bg;
+}
+
+.story #background #glows {
+  grid-area: bg;
+  filter: blur(10px);
+}
+
+.story #background #paths {
+  grid-area: bg;
 }
