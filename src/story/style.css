@@ -53,10 +53,12 @@
 }
 
 .story #background #glows {
+  z-index: 0;
   grid-area: bg;
-  filter: blur(10px);
+  filter: blur(20px);
 }
 
 .story #background #paths {
+  z-index: 1;
   grid-area: bg;
 }
